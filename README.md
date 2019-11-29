@@ -3,8 +3,12 @@ A object oriented approach in MATLAB to store, process, and access volumetric da
 
 # Features - VolumetricDataset
 
+Implemented:
 *  Convenient definition of datasets based on resolution and origin
 *  Automated dependent properties like volume size, max, min, vectors
+
+Planned:
+*  Derived classes for different imaging modalities including more specific properties
 
 # Features - VolumeProcessor
 
@@ -21,3 +25,6 @@ Planned:
 *  GPU based deconvolution options
 *  GPU based vesselness filtering
 *  Histogram equilization over full volume instead of CLAHE3D
+*  Amira export
+*  `*.h5` export option
+*  More memory efficient saving and loading of VolumetricDataset class
