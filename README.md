@@ -14,8 +14,8 @@ Planned:
 
 Implemented:
 *  CLAHE3D - Contrast limited adaptive histogram equilization
-*  Vesselness filtering (requires k wave toolbox for now)
-*  Implementation of different deconvolution approaches 
+*  Vesselness filtering (requires k wave toolbox for now, http://k-wave.org)
+*  Implementation of different deconvolution approaches
 *  PolarityHandling methods for bipolar signals
 *  Memory efficient resampling to differet grid sizes
 *  Export function for paraview (based on vtkwrite from MATLAB fileexchange)
