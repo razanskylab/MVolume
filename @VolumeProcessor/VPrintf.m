@@ -10,7 +10,7 @@ function VPrintf(vp, message, flagName)
 
 	if vp.flagVerbose
 		if flagName
-			message = ['[VolumeProcessor]', message];
+			message = ['[VolumeProcessor] ', message];
 		end
 		fprintf(message);
 	end	

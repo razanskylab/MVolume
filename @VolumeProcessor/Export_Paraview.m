@@ -92,7 +92,7 @@ function Export_Paraview(vp, varargin)
 			'origin', vp.volume.origin(2), vp.volume.origin(3), vp.volume.origin(1), ... % origin of dataset
 			'BINARY');  % binary flag
 
-		vp.VPrintf('done!\n');
+		vp.VPrintf('done!\n', 0);
 	else
 		error('Cannot export an nonexisting volume');
 	end

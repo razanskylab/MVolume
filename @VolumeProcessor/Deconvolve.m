@@ -6,17 +6,19 @@
 % Description: Takes the volumetic image and deconvolves it with 
 % the point spread function to reduce image blurring.
 
-function Deconvolve(ws, varargin)
+function Deconvolve(vp, varargin)
 	
 	% default settings
 	method = 'blind';
 	psf = [];
 	nIter = 10;
 	dampar = 0;
-	polarityHandler = '';
+	polarityHandler = 'abs';
+	% options
+	% abs, pos, neg, none
 
 	for iargin=1:2:(nargin-1)
-		switch vararign{iargin}
+		switch varargin{iargin}
 			case 'nIter'
 				nIter = varargin{iargin+1};
 			case 'dampar'
@@ -31,37 +33,35 @@ function Deconvolve(ws, varargin)
 				error('Never heard of such an option bro');
 		end
 	end
-	ws.saftedVol = abs(ws.saftedVol);
-	psf = abs(ws.usTransducer.Get_PSF(ws.dZ, ws.dX, ws.dY));
 
-	nIter = 10; % can be very time consuming if high
-	dampar = 0;
+	vp.Handle_Polarity(polarityHandler);
+	psf = abs(psf);
 
 	% deblur image using blind deconvolution
 	% psf guess is known
-	switch ws.deconvMethod
+	switch method
 		case 'lucy'
 			% deblur image based on richard lucy deconvolution
 			% psf known, noise unknown
 			% https://de.mathworks.com/help/images/ref/deconvlucy.html#f1-535133
-			ws.saftedVol = deconvlucy(ws.saftedVol, psf, nIter);
+			vp.volume.vol = deconvlucy(vp.volume.vol, single(psf), nIter, single(dampar));
 			% ws.saftedVol - input volume for deconvolution
 			% psf - estimate of point spread function
 			% nIter - number of iterations
 			% dampar - damping to reduce noise amplification
 		case 'blind'
-			[ws.saftedVol, psfr] = deconvblind(ws.saftedVol, psf, nIter);
+			[vp.volume.vol, psfr] = deconvblind(vp.volume.vol, psf, nIter);
 			% psfi: initial guess of point spread function
 			% 		size of matrix strongly affects the outcome
 		case 'wiener'
 			% deblur image based on wiener filter algorithm
 			% https://de.mathworks.com/help/images/ref/deconvwnr.html
-			ws.saftedVol = deconvwnr(ws.saftedVol, psf);
+			vp.volume.vol = deconvwnr(vp.volume.vol, psf);
 		otherwise
 			error('Unknown deconvolution method');
 	end
 
-	ws.VPrintf('done!\n', 0);
+	vp.VPrintf('done!\n', 0);
 	toc
 
 end

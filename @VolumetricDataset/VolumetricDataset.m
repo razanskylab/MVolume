@@ -33,7 +33,9 @@ classdef VolumetricDataset < handle
 		center(1, 3) single; % center position of volume defined in [z, x, y]
 		minVol(1, 1) single; % defines minimum of volume
 		maxVol(1, 1) single; % defines maximum of volume
-  end
+  	maxAbsVol(1, 1) single;
+	end
+
 
   methods
 
@@ -115,6 +117,10 @@ classdef VolumetricDataset < handle
 
 		function maxVol = get.maxVol(vd)
 			maxVol = max(vd.vol(:));
+		end
+
+		function maxAbsVol = get.maxAbsVol(vd)
+			maxAbsVol = max(abs(vd.vol(:)));
 		end
 
   end

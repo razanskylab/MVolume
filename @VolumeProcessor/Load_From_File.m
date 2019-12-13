@@ -23,7 +23,7 @@ function Load_From_File(vp, varargin)
 		vp.VPrintf('Loading dataset... ', 1);
 		load(datasetPath);
 		vp.volume = volDataset; 
-		vp.VPrintf('done!\n');
+		vp.VPrintf('done!\n', 0);
 	else
 		error('Path is not pointing to a file');
 	end

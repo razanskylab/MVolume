@@ -22,11 +22,16 @@ classdef VolumeProcessor < handle
 		Frangi_Filter(vp, varargin); % vesselness enhancement running on volume
 		Resampling(vp, varargin); % performs resampling of the dataset to a new defined resolution
 		Adaptive_Histogram(vp, varargin); % performs adaptive histogram equilization
-		
+		s = Get_Sharpness(vp, varargin);
+		Deconvolve(vp, varargin); % applies a threedimensional deconvolution
+		Normalize(vp, varargin); % advanced normalization
+		Get_MIP(vp, varargin);
+		Power_Law_Transform(vp, varargin);
+
 		% not implemented / tested yet
 		Preview(vp); % matlab based preview of volume
-		Deconvolve(vp); % applies a threedimensional deconvolution
 		Median_Filter(vp); % apply a median filter to the volume
+		
 	end
 
 end
