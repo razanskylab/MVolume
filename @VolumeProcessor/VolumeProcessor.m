@@ -27,10 +27,10 @@ classdef VolumeProcessor < handle
 		Normalize(vp, varargin); % advanced normalization
 		Get_MIP(vp, varargin);
 		Power_Law_Transform(vp, varargin);
+		Median_Filter(vp, varargin); % apply a median filter to the volume
 
 		% not implemented / tested yet
 		Preview(vp); % matlab based preview of volume
-		Median_Filter(vp); % apply a median filter to the volume
 		
 	end
 

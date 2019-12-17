@@ -36,9 +36,7 @@ classdef VolumetricDataset < handle
   	maxAbsVol(1, 1) single;
 	end
 
-
   methods
-
     function volSize = get.volSize(vd)
       volSize = size(vd.vol);
     end

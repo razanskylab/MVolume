@@ -9,11 +9,16 @@
 
 function s = Get_Sharpness(vp, varargin)
 
+	% default settings
 	metric = 'brenner';
+	noiseThres = 0.01;
+	
 	for iargin=1:2:(nargin-1)
 		switch varargin{iargin}
 			case 'metric'
 				metric = varargin{iargin + 1};
+			case 'noiseThres'
+				noiseThres = varargin{iargin+1};
 			otherwise
 				error('Unknown option passed.');
 		end
@@ -21,9 +26,12 @@ function s = Get_Sharpness(vp, varargin)
 
 	switch metric
 		case 'brenner'
-			bren_x = (vp.volume.vol(1:end-1, :, :) - vp.volume.vol(2:end, :, :)).^2; 
-			bren_y = (vp.volume.vol(:, 1:end-1, :) - vp.volume.vol(:, 2:end, :)).^2; 
-			bren_z = (vp.volume.vol(:, :, 1:end-1) - vp.volume.vol(:, :, 2:end)).^2;
+			vp.Normalize('polarity', 'both');
+			temp = abs(vp.volume.vol);
+			temp(vp.volume.vol < noiseThres) = 0;
+			bren_x = (temp(1:end-1, :, :) - temp(2:end, :, :)).^2; 
+			bren_y = (temp(:, 1:end-1, :) - temp(:, 2:end, :)).^2; 
+			bren_z = (temp(:, :, 1:end-1) - temp(:, :, 2:end)).^2;
 			s = sum(bren_x(:)) + sum(bren_y(:)) + sum(bren_z(:));
 		case 'brenner2d'
 			mip = squeeze(max(abs(vp.volume.vol), [], 1));

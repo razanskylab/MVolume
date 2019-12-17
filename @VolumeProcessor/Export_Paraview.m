@@ -13,13 +13,15 @@
 %				abs - uses the absolute of the signal
 % 			pos - only keep positive signals
 % 			neg - only keep negative signals
-%		- normalize
+%		- flagNormalize
 %				1 - normalizes signals to range from 0 to 1
 %				0 - do not normalize anything
 % 	- nonFiniteHandler - specifies how we should handle non finite values
 %				none - do not remove non finite elements
 % 			remove - sets non finite elements to 0
 % 			error - throw an error if this occurs
+% 	- xCrop,yCrop,zCrop - if passed we will crop the volume from x/y/zCrop(1) to (2)
+%       specified in same units as vp.volume
 
 function Export_Paraview(vp, varargin)
 
@@ -28,6 +30,9 @@ function Export_Paraview(vp, varargin)
 	polarityHandler = 'abs';
 	nonFiniteHandler = 'remove';
 	flagNormalize = 1;
+	xCrop = []; % x cropping volume in mm
+	yCrop = []; % y cropping volume in mm
+	zCrop = []; % z cropping volume in mm
 
 	% if no input path is specified save to default
 	for iargin=1:2:(nargin-1)
@@ -40,8 +45,52 @@ function Export_Paraview(vp, varargin)
 				nonFiniteHandler = varargin{iargin+1};
 			case 'flagNormalize'
 				flagNormalize = varargin{iargin+1};
+			case 'xCrop'
+				xCrop = varargin{iargin + 1};
+				% check that xCrop is linearly rising
+				if (xCrop(1) >= xCrop(2))
+					error('xCrop(2) must be bigger then xCrop(1)');
+				end
+				if (xCrop(1) < vp.volume.xVec(1))
+					warning('Requested x crop exceeds FOV, reducing to boundary');
+					xCrop(1) = vp.volume.xVec(1);
+				end
+				if (xCrop(2) > vp.volume.xVec(end))
+					warning('Requested x crop exceeds FOV, reducing to boundary');
+					xCrop(2) = vp.volume.xVec(end);
+				end
+			case 'yCrop'
+				yCrop = varargin{iargin + 1};
+				% check that yCrop is linearly rising
+				if (yCrop(1) >= yCrop(2))
+					error('yCrop(2) must be bigger then yCrop(1)');
+				end
+			
+				if (yCrop(1) < vp.volume.yVec(1))
+					warning('Requested y crop exceeds FOV, reducing to boundary');
+					yCrop(1) = vp.volume.yVec(1);
+				end
+				if (yCrop(2) > vp.volume.yVec(end))
+					warning('Requested y crop exceeds FOV, reducing to boundary');
+					yCrop(2) = vp.volume.yVec(end);
+				end
+			case 'zCrop'
+				zCrop = varargin{iargin + 1};
+				% check that zCrop is linearly rising
+				if (zCrop(1) >= zCrop(2))
+					error('zCrop(2) must be bigger then zCrop(1)');
+				end
+			
+				if (zCrop(1) < vp.volume.zVec(1))
+					warning('Requested z crop exceeds FOV, reducing to boundary');
+					zCrop(1) = vp.volume.zVec(1);
+				end
+				if (zCrop(2) > vp.volume.zVec(end))
+					warning('Requested z crop exceeds FOV, reducing to boundary');
+					zCrop(2) = vp.volume.zVec(end);
+				end
 			otherwise
-				error('Unknown option');
+				error('Unknown option passed');
 		end
 	end
 
@@ -83,13 +132,41 @@ function Export_Paraview(vp, varargin)
 			name = 'exportedDataset';
 		end
 
+		if isempty(xCrop)
+			xIdxMin = 1;
+			xIdxMax = vp.volume.nX;
+		else
+			[~, xIdxMin] = min(abs(xCrop(1) - vp.volume.vecX));
+			[~, xIdxMax] = min(abs(xCrop(2) - vp.volume.vecX));
+
+		end
+		xCropIdx = xIdxMin:xIdxMax;
+
+		if isempty(yCrop)
+			yCropMin = 1;
+			yCropMax = vp.volume.nY;
+		else
+			[~, yCropMin] = min(abs(yCrop(1) - vp.volume.vecY));
+			[~, yCropMax] = min(abs(yCrop(2) - vp.volume.vecY)); 
+		end
+		yCropIdx = yCropMin:yCropMax;
+
+		if isempty(zCrop)
+			zCropMin = 1; 
+			zCropMax = vp.volume.nZ;
+		else
+			[~, zCropMin] = min(abs(zCrop(1) - vp.volune.vecZ));
+			[~, zCropMax] = min(abs(zCrop(2) - vp.volume.vecZ));
+		end
+		zCropIdx = zCropMin:zCropMax;
+
 		vtkwrite(... % actual export function
 			datasetPath, ... % output path for vtk file
 			'structured_points', ... % dataset type (for volumes use structured_points)
 			name, ... % name of dataset in paraview
-			permute(vp.volume.vol, [2, 3, 1]), ... % matlab 3d matrix
+			permute(vp.volume.vol(zCropIdx, xCropIdx, yCropIdx), [2, 3, 1]), ... % matlab 3d matrix
 			'spacing', vp.volume.dX, vp.volume.dY, vp.volume.dZ, ... % spacing
-			'origin', vp.volume.origin(2), vp.volume.origin(3), vp.volume.origin(1), ... % origin of dataset
+			'origin', vp.volume.vecX(xCropIdx(1)), vp.volume.vecY(yCropIdx(1)), vp.volume.vecZ(zCropIdx(1)), ... % origin of dataset
 			'BINARY');  % binary flag
 
 		vp.VPrintf('done!\n', 0);

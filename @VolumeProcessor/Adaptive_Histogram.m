@@ -12,8 +12,8 @@
 
 function Adaptive_Histogram(vp, varargin)
 
-	binSize = 750;
-	subVolSize = [0.5, 1, 1] * 1e-3;
+	binSize = 500;
+	subVolSize = [0.5, 1, 1] * 1e-3; % [z, x, y]
 	clipLimit = 0.02;
 	polarityHandler = 'abs';
 
@@ -22,7 +22,7 @@ function Adaptive_Histogram(vp, varargin)
 			case 'binSize'
 				binSize = varargin{iargin + 1};
 			case 'subVolSize'
-				volSizeMm = varargin{iargin + 1};
+				subVolSize = varargin{iargin + 1};
 			case 'clipLimit'
 				clipLimit = varargin{iargin + 1};
 			case 'polarityHandler'
