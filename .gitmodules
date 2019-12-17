@@ -1,0 +1,6 @@
+[submodule "CLAHE3D"]
+	path = CLAHE3D
+	url = https://github.com/hofmannu/CLAHE3D.git
+[submodule "vtkwrite"]
+	path = vtkwrite
+	url = https://github.com/joe-of-all-trades/vtkwrite.git
